@@ -5,8 +5,13 @@ import Add from "./components/Add";
 
 Vue.config.silent = false;
 
+const routes = {
+    home: Home,
+    add: Add,
+}
+
 new Vue({
 
-    render: h => h('frame', [h(Add)])
+    render: h => h('frame', [h(routes.home)])
 
 }).$start();

@@ -40,19 +40,57 @@
       <!-- The number of TabContentItem components should corespond to the number of TabStripItem components -->
       <!-- Chart Page Content Start -->
       <TabContentItem>
-        <StackLayout>
-          <Label text="Expense of every month" class="h2 text-center"></Label>
-          <RadCartesianChart>
-            <CategoricalAxis v-tkCartesianHorizontalAxis />
-            <LinearAxis v-tkCartesianVerticalAxis />
-            <LineSeries
-              v-tkCartesianSeries
-              :items="chartData"
-              categoryProperty="Month"
-              valueProperty="Amount"
-            />
-          </RadCartesianChart>
-        </StackLayout>
+        <!-- <TabView
+          :selectedIndex="selectedIndex"
+          @selectedIndexChange="indexChange"
+        > -->
+        <TabView>
+          <TabViewItem title="Expense of Every Month">
+            <StackLayout>
+              <Label
+                text="Expense of every month"
+                class="h2 text-center"
+              ></Label>
+              <RadCartesianChart>
+                <CategoricalAxis v-tkCartesianHorizontalAxis />
+                <LinearAxis v-tkCartesianVerticalAxis />
+                <LineSeries
+                  v-tkCartesianSeries
+                  :items="chartData"
+                  categoryProperty="Month"
+                  valueProperty="Amount"
+                />
+              </RadCartesianChart>
+            </StackLayout>
+          </TabViewItem>
+          <TabViewItem title="Expense Type">
+            <StackLayout>
+              <Label text="Expense Type" class="h2 text-center"></Label>
+
+              <RadPieChart allowAnimation="true" row="1">
+                <DonutSeries
+                  v-tkPieSeries
+                  selectionMode="DataPoint"
+                  expandRadius="0.4"
+                  outerRadiusFactor="0.7"
+                  innerRadiusFactor="0.4"
+                  valueProperty="Amount"
+                  legendLabel="Genre"
+                  :items="typeItem"
+                />
+
+                <RadLegendView
+                  v-tkPieLegend
+                  position="Right"
+                  title="Genre"
+                  offsetOrigin="TopRight"
+                  width="110"
+                  enableSelection="true"
+                ></RadLegendView>
+              </RadPieChart>
+            </StackLayout>
+          </TabViewItem>
+        </TabView>
       </TabContentItem>
       <!-- Chart Page Content End -->
       <!-- Home Page Content Start -->
@@ -94,33 +132,33 @@
         <StackLayout>
           <Label text="Calendar" class="h2 text-center"></Label>
           <StackLayout row="1" orientation="horizontal">
-            <Button
+            <!-- <Button
               class="viewButton"
               width="18%"
               text="Week"
               @tap="onWeekTap"
-            ></Button>
+            ></Button> -->
             <Button
               class="viewButton"
-              width="18%"
+              width="20%"
               text="Month"
               @tap="onMonthTap"
             ></Button>
             <Button
               class="viewButton"
-              width="25%"
-              text="Month names"
+              width="20%"
+              text="Month Names"
               @tap="onMonthNamesTap"
             ></Button>
             <Button
               class="viewButton"
-              width="18%"
+              width="20%"
               text="Year"
               @tap="onYearTap"
             ></Button>
             <Button
               class="viewButton"
-              width="18%"
+              width="20%"
               text="Day"
               @tap="onDayTap"
             ></Button>
@@ -143,38 +181,38 @@ Vue.use(RadChart);
 import CalendarView from "nativescript-ui-calendar/vue";
 Vue.use(CalendarView);
 import { CalendarViewMode } from "nativescript-ui-calendar";
-import { getDates } from "~/util/data"
 
-// Sample Data
-function getExpenseData() {
-  return [
-    { Month: "1", Amount: 15 },
-    { Month: "2", Amount: 13 },
-    { Month: "3", Amount: 24 },
-    { Month: "4", Amount: 11 },
-    { Month: "5", Amount: 18 },
-    { Month: "6", Amount: 22 },
-    { Month: "7", Amount: 30 },
-    { Month: "8", Amount: 50 },
-    { Month: "9", Amount: 25 },
-    { Month: "10", Amount: 30 },
-    { Month: "11", Amount: 20 },
-    { Month: "12", Amount: 40 },
-  ];
-}
+require("~/util/data");
+import { getEvent, getMonthlyItem, getTypeItem } from "~/util/data";
+import { getItem, resetItem, deleteItem } from "~/util/data";
+
+import Add from "~/components/Add";
+
+
+// resetItem();
 
 export default {
   methods: {
     onAddTap() {
-      console.log("Test");
+      // Navigate to Add Page
+      console.log("Add Btn Tapped");
+      this.$navigateTo(Add);
     },
-    onChartTap() {},
+    onChartTap() {
+      this.chartData = getMonthlyItem();
+      this.typeItem = getTypeItem();
+    },
     onCalendarTap() {},
-    onHometap() {},
+    onHometap() {
+      this.listOfItems = getItem();
+    },
     onItemTap(e) {
       var message = e.item.title + " in " + e.item.date;
-      action("Your message", "Cancel", ["Edit", "Delete"]).then((result) => {
-        console.log(result);
+      action(message, "Cancel", ["Delete"]).then((result) => {
+        if (result == "Delete") {
+          deleteItem(e.item);
+          this.listOfItems = getItem();
+        }
       });
       // console.log(e)
     },
@@ -201,61 +239,11 @@ export default {
   },
   data() {
     return {
-      events: getDates(),
+      events: getEvent(),
       viewMode: CalendarViewMode.Month,
-      chartData: getExpenseData(),
-      listOfItems: [
-        { title: "Lunch", date: "22/06/2020", time: "12:33:05", amount: -300 },
-        {
-          title: "Salary From XX Company",
-          date: "22/06/2020",
-          time: "17:26:41",
-          amount: 2000,
-        },
-        {
-          title: "Ipad Pro",
-          date: "23/06/2020",
-          time: "10:51:39",
-          amount: -7000,
-        },
-        {
-          title: "Pently of overspeed",
-          date: "23/06/2020",
-          time: "13:00:14",
-          amount: -500,
-        },
-        {
-          title: "Car Maintance",
-          date: "24/06/2020",
-          time: "18:44:21",
-          amount: -8000,
-        },
-        { title: "Lunch", date: "22/06/2020", time: "12:33:05", amount: -300 },
-        {
-          title: "Salary From XX Company",
-          date: "22/06/2020",
-          time: "17:26:41",
-          amount: 2000,
-        },
-        {
-          title: "Ipad Pro",
-          date: "23/06/2020",
-          time: "10:51:39",
-          amount: -7000,
-        },
-        {
-          title: "Pently of overspeed",
-          date: "23/06/2020",
-          time: "13:00:14",
-          amount: -500,
-        },
-        {
-          title: "Car Maintance",
-          date: "24/06/2020",
-          time: "18:44:21",
-          amount: -8000,
-        },
-      ],
+      chartData: getMonthlyItem(),
+      listOfItems: getItem(),
+      typeItem: getTypeItem(),
     };
   },
 };
